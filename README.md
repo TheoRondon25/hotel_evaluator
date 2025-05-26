@@ -28,4 +28,4 @@ O **HotelEvaluator** utiliza técnicas de NLP para analisar comentários de clie
 
 ## Hospedagem
 
-Este projeto está configurado para ser facilmente hospedado na plataforma Render.
+Este projeto está hospedado na plataforma Render <a>https://hotel-evaluator.onrender.com/</a>
