@@ -2,3 +2,4 @@ flask==2.3.3
 spacy==3.8.0
 textblob==0.17.1
 gunicorn==21.2.0
+pt_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.8.0/pt_core_news_sm-3.8.0-py3-none-any.whl
