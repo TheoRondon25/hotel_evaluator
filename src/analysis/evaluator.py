@@ -109,6 +109,67 @@ def categorizar_tokens(frase):
         resultado.append((original, categoria or "Desconhecido"))
     return resultado
 
+def validar_texto(texto: str) -> bool:
+    """
+    Valida se o texto contém pelo menos uma palavra de cada categoria necessária.
+    
+    Args:
+        texto (str): O texto a ser validado
+        
+    Returns:
+        bool: True se o texto contém palavras válidas, False caso contrário
+    """
+    # Converte para minúsculo e remove pontuação
+    texto = texto.lower()
+    texto = texto.replace('.', '').replace(',', '')
+    
+    # Divide em palavras e remove acentos, exceto do verbo "é"
+    palavras = []
+    for palavra in texto.split():
+        if palavra == "é":
+            palavras.append(palavra)
+        else:
+            palavras.append(remover_acentos(palavra))
+    
+    # Verifica se tem pelo menos uma palavra de cada categoria
+    tem_area = any(
+        palavra in tokens_gramatica["Area"] or 
+        remover_acentos(palavra) in tokens_gramatica["Area"] 
+        for palavra in palavras
+    )
+    
+    tem_verbo = any(
+        palavra in tokens_gramatica["Verb"] or 
+        remover_acentos(palavra) in tokens_gramatica["Verb"] 
+        for palavra in palavras
+    )
+    
+    tem_intensificador = any(
+        palavra in tokens_gramatica["Intensificador"] or 
+        remover_acentos(palavra) in tokens_gramatica["Intensificador"] 
+        for palavra in palavras
+    )
+    
+    # Verifica se tem pelo menos uma palavra de sentimento (positivo, negativo ou neutro)
+    tem_sentimento = any(
+        palavra in tokens_gramatica["Positivo"] or
+        palavra in tokens_gramatica["Negativo"] or
+        palavra in tokens_gramatica["Neutro"] or
+        remover_acentos(palavra) in tokens_gramatica["Positivo"] or
+        remover_acentos(palavra) in tokens_gramatica["Negativo"] or
+        remover_acentos(palavra) in tokens_gramatica["Neutro"]
+        for palavra in palavras
+    )
+    
+    # Debug: imprime as palavras encontradas
+    print(f"Palavras limpas: {palavras}")
+    print(f"Tem área: {tem_area}")
+    print(f"Tem verbo: {tem_verbo}")
+    print(f"Tem intensificador: {tem_intensificador}")
+    print(f"Tem sentimento: {tem_sentimento}")
+    
+    # Retorna True se tiver pelo menos uma palavra de cada categoria necessária
+    return tem_area and (tem_verbo or tem_intensificador) and tem_sentimento
 
 @dataclass
 class EvaluationResult:
@@ -133,6 +194,10 @@ class HotelEvaluator:
         """
         if not comment or not isinstance(comment, str):
             return {"error": "Comentário inválido"}
+            
+        # Valida se o texto contém palavras válidas
+        if not validar_texto(comment):
+            return {"error": "O texto não contém palavras válidas para avaliação. Use palavras relacionadas a áreas do hotel (quarto, comida, serviço), verbos (é, foi, estava) e adjetivos (ótimo, ruim, bom)."}
 
         # Processa o comentário
         doc = self.nlp(comment.lower())
