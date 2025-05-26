@@ -132,9 +132,9 @@ function generateImprovementTip(data) {
 
 // Exemplos predefinidos
 const examples = [
-  "Adoramos nossa estadia! O quarto era espaçoso e a equipe foi incrivelmente prestativa.",
-  "Localização perfeita e café da manhã delicioso, mas o quarto precisava de uma limpeza mais cuidadosa.",
-  "Infelizmente, não atendeu às expectativas. Barulho excessivo e serviço de quarto muito lento.",
+  "O quarto foi ótimo.",
+  "A localização é razoável.",
+  "O serviço foi ruim.",
 ];
 
 function useExample(index) {
