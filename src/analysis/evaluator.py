@@ -2,21 +2,64 @@ from numpy import positive
 import spacy;
 import unicodedata;
 import re;
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 from dataclasses import dataclass
 
 #Carrega o modelo de linguagem em português do spacy
 nlp = spacy.load("pt_core_news_sm");
+
+# Função para gerar automaticamente formas masculinas e femininas
+def expandir_genero(palavras: List[str]) -> Set[str]:
+    """
+    Gera automaticamente as formas masculinas e femininas das palavras
+    baseadas em regras simples de português.
+    
+    Args:
+        palavras: Lista de palavras a serem expandidas
+        
+    Returns:
+        Conjunto com todas as palavras originais e suas variações de gênero
+    """
+    resultado = set()
+    
+    for palavra in palavras:
+        # Adiciona a palavra original
+        resultado.add(palavra)
+        
+        # Regras comuns de conversão português
+        if palavra.endswith('o'):  # masculino -> feminino (ex: bonito -> bonita)
+            resultado.add(palavra[:-1] + 'a')
+        elif palavra.endswith('a'):  # feminino -> masculino (ex: bonita -> bonito)
+            resultado.add(palavra[:-1] + 'o')
+        elif palavra.endswith('or'):  # (ex: encantador -> encantadora)
+            resultado.add(palavra + 'a')
+        
+    return resultado
+
+# Definições base de palavras
+positivas_base = ["otimo", "excelente", "perfeito", "maravilhoso", "agradavel", 
+                 "bom", "incrivel", "fantastico", "delicioso", "espetacular", 
+                 "surpreendente", "esplendido", "encantador", "satisfatorio"]
+                 
+negativas_base = ["pessimo", "ruim", "terrivel", "desagradavel", "horrivel", 
+                 "fraco", "insatisfatorio", "inadequado", "decepcionante", 
+                 "desapontador", "deploravel", "lamentavel"]
+                 
+neutras_base = ["normal", "razoavel", "ok", "regular", "medio", "comum", "aceitavel"]
+
+areas_base = ["quarto", "estadia", "comida", "restaurante", "atendimento", "piscina", 
+            "area", "infantil", "de", "lazer", "academia", "limpeza", "localizacao", 
+            "hotel", "cafe", "servico", "servicos", "funcionarios", "vista", "preco"]
 
 # Define as categorias da gramática e os respectivos conjuntos(tokens) de palavras associadas a cada categoria
 tokens_gramatica = {
     "Det": {"o", "a", "essa", "esse", "minha", "meu"},
     "Verb": {"foi", "esta", "é", "parece", "sao", "estao", "estava", "estar", "ser"},
     "Intensificador": {"muito", "super", "pouco", "bastante", "extremamente"},
-    "Positivo": {"otimo", "otima", "excelente", "perfeito", "maravilhoso", "maravilhosa", "agradavel", "bom", "boa"},
-    "Negativo": {"pessimo", "pessima", "ruim", "terrivel", "desagradavel", "horrivel"},
-    "Neutro": {"normal", "razoavel", "ok", "regular"},
-    "Area": {"quarto", "estadia", "comida", "restaurante", "atendimento", "piscina", "area", "infantil", "de", "lazer", "academia", "limpeza", "localizacao"},
+    "Positivo": expandir_genero(positivas_base),
+    "Negativo": expandir_genero(negativas_base),
+    "Neutro": expandir_genero(neutras_base),
+    "Area": set(areas_base),
     "Conector": {"mas", "porem", "e", "contudo", "entretanto", ","}
 }
 
@@ -86,17 +129,18 @@ class HotelEvaluator:
         # Analisa cada token
         for token in doc:
             token_text = token.text.lower()
+            token_text_sem_acento = remover_acentos(token_text)
             
             # Verifica se é um aspecto
-            if token_text in tokens_gramatica["Area"]:
+            if token_text in tokens_gramatica["Area"] or token_text_sem_acento in tokens_gramatica["Area"]:
                 current_aspect = token_text
             
             # Verifica se é um intensificador
-            elif token_text in tokens_gramatica["Intensificador"]:
+            elif token_text in tokens_gramatica["Intensificador"] or token_text_sem_acento in tokens_gramatica["Intensificador"]:
                 current_intensifier = token_text
             
             # Verifica se é um sentimento
-            elif token_text in tokens_gramatica["Positivo"]:
+            elif token_text in tokens_gramatica["Positivo"] or token_text_sem_acento in tokens_gramatica["Positivo"]:
                 sentiment = "positivo"
                 results.append({
                     "aspect": current_aspect or "geral",
@@ -106,7 +150,7 @@ class HotelEvaluator:
                 sentiments.append(1)
                 current_intensifier = None
                 
-            elif token_text in tokens_gramatica["Negativo"]:
+            elif token_text in tokens_gramatica["Negativo"] or token_text_sem_acento in tokens_gramatica["Negativo"]:
                 sentiment = "negativo"
                 results.append({
                     "aspect": current_aspect or "geral",
@@ -116,7 +160,7 @@ class HotelEvaluator:
                 sentiments.append(-1)
                 current_intensifier = None
                 
-            elif token_text in tokens_gramatica["Neutro"]:
+            elif token_text in tokens_gramatica["Neutro"] or token_text_sem_acento in tokens_gramatica["Neutro"]:
                 sentiment = "neutro"
                 results.append({
                     "aspect": current_aspect or "geral",
