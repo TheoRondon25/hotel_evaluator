@@ -26,4 +26,4 @@ Este projeto utiliza técnicas de processamento de linguagem natural (NLP) para 
 
 ## Hospedagem
 
-Este projeto está configurado para ser facilmente hospedado na plataforma Render.
+Este projeto está hospedado via Render <a>https://hotel-evaluator.onrender.com/</a>
