@@ -8,10 +8,10 @@ from dataclasses import dataclass
 #Carrega o modelo de linguagem em português do spacy
 nlp = spacy.load("pt_core_news_sm");
 
-# Função para gerar automaticamente formas masculinas e femininas
+# Função para gerar automaticamente formas masculinas, femininas, singulares e plurais
 def expandir_genero(palavras: List[str]) -> Set[str]:
     """
-    Gera automaticamente as formas masculinas e femininas das palavras
+    Gera automaticamente as formas masculinas, femininas, singulares e plurais das palavras
     baseadas em regras simples de português.
     
     Args:
@@ -29,10 +29,27 @@ def expandir_genero(palavras: List[str]) -> Set[str]:
         # Regras comuns de conversão português
         if palavra.endswith('o'):  # masculino -> feminino (ex: bonito -> bonita)
             resultado.add(palavra[:-1] + 'a')
+            resultado.add(palavra + 's')  # plural masculino
+            resultado.add(palavra[:-1] + 'as')  # plural feminino
         elif palavra.endswith('a'):  # feminino -> masculino (ex: bonita -> bonito)
             resultado.add(palavra[:-1] + 'o')
+            resultado.add(palavra + 's')  # plural feminino
+            resultado.add(palavra[:-1] + 'os')  # plural masculino
+        elif palavra.endswith('os'):
+            resultado.add(palavra[:-2] + 'o')
+            resultado.add(palavra[:-2] + 'a')
+            resultado.add(palavra[:-2] + 'as')
+        elif palavra.endswith('as'):
+            resultado.add(palavra[:-2] + 'a')
+            resultado.add(palavra[:-2] + 'o')
+            resultado.add(palavra[:-2] + 'os')
         elif palavra.endswith('or'):  # (ex: encantador -> encantadora)
             resultado.add(palavra + 'a')
+            resultado.add(palavra + 'es')
+            resultado.add(palavra + 'as')
+        else:
+            # Adiciona plural simples
+            resultado.add(palavra + 's')
         
     return resultado
 
@@ -130,17 +147,24 @@ class HotelEvaluator:
         for token in doc:
             token_text = token.text.lower()
             token_text_sem_acento = remover_acentos(token_text)
+            token_lemma = remover_acentos(token.lemma_.lower())
             
             # Verifica se é um aspecto
-            if token_text in tokens_gramatica["Area"] or token_text_sem_acento in tokens_gramatica["Area"]:
+            if (token_text in tokens_gramatica["Area"] or 
+                token_text_sem_acento in tokens_gramatica["Area"] or
+                token_lemma in tokens_gramatica["Area"]):
                 current_aspect = token_text
             
             # Verifica se é um intensificador
-            elif token_text in tokens_gramatica["Intensificador"] or token_text_sem_acento in tokens_gramatica["Intensificador"]:
+            elif (token_text in tokens_gramatica["Intensificador"] or 
+                  token_text_sem_acento in tokens_gramatica["Intensificador"] or
+                  token_lemma in tokens_gramatica["Intensificador"]):
                 current_intensifier = token_text
             
             # Verifica se é um sentimento
-            elif token_text in tokens_gramatica["Positivo"] or token_text_sem_acento in tokens_gramatica["Positivo"]:
+            elif (token_text in tokens_gramatica["Positivo"] or 
+                  token_text_sem_acento in tokens_gramatica["Positivo"] or
+                  token_lemma in tokens_gramatica["Positivo"]):
                 sentiment = "positivo"
                 results.append({
                     "aspect": current_aspect or "geral",
@@ -150,7 +174,9 @@ class HotelEvaluator:
                 sentiments.append(1)
                 current_intensifier = None
                 
-            elif token_text in tokens_gramatica["Negativo"] or token_text_sem_acento in tokens_gramatica["Negativo"]:
+            elif (token_text in tokens_gramatica["Negativo"] or 
+                  token_text_sem_acento in tokens_gramatica["Negativo"] or
+                  token_lemma in tokens_gramatica["Negativo"]):
                 sentiment = "negativo"
                 results.append({
                     "aspect": current_aspect or "geral",
@@ -160,7 +186,9 @@ class HotelEvaluator:
                 sentiments.append(-1)
                 current_intensifier = None
                 
-            elif token_text in tokens_gramatica["Neutro"] or token_text_sem_acento in tokens_gramatica["Neutro"]:
+            elif (token_text in tokens_gramatica["Neutro"] or 
+                  token_text_sem_acento in tokens_gramatica["Neutro"] or
+                  token_lemma in tokens_gramatica["Neutro"]):
                 sentiment = "neutro"
                 results.append({
                     "aspect": current_aspect or "geral",
