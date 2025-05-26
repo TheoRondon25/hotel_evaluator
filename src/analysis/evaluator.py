@@ -207,12 +207,18 @@ class HotelEvaluator:
         current_intensifier = None
         results = []
         sentiments = []
+        negacao = False
         
         # Analisa cada token
         for token in doc:
             token_text = token.text.lower()
             token_text_sem_acento = remover_acentos(token_text)
             token_lemma = remover_acentos(token.lemma_.lower())
+
+            # Verifica negação
+            if token_text == 'não' or token_text_sem_acento == 'nao':
+                negacao = True
+                continue
             
             # Verifica se é um aspecto
             if (token_text in tokens_gramatica["Area"] or 
@@ -230,26 +236,28 @@ class HotelEvaluator:
             elif (token_text in tokens_gramatica["Positivo"] or 
                   token_text_sem_acento in tokens_gramatica["Positivo"] or
                   token_lemma in tokens_gramatica["Positivo"]):
-                sentiment = "positivo"
+                sentiment = "negativo" if negacao else "positivo"
                 results.append({
                     "aspect": current_aspect or "geral",
                     "sentiment": sentiment,
                     "intensifier": current_intensifier
                 })
-                sentiments.append(1)
+                sentiments.append(-1 if negacao else 1)
                 current_intensifier = None
+                negacao = False
                 
             elif (token_text in tokens_gramatica["Negativo"] or 
                   token_text_sem_acento in tokens_gramatica["Negativo"] or
                   token_lemma in tokens_gramatica["Negativo"]):
-                sentiment = "negativo"
+                sentiment = "positivo" if negacao else "negativo"
                 results.append({
                     "aspect": current_aspect or "geral",
                     "sentiment": sentiment,
                     "intensifier": current_intensifier
                 })
-                sentiments.append(-1)
+                sentiments.append(1 if negacao else -1)
                 current_intensifier = None
+                negacao = False
                 
             elif (token_text in tokens_gramatica["Neutro"] or 
                   token_text_sem_acento in tokens_gramatica["Neutro"] or
@@ -262,6 +270,7 @@ class HotelEvaluator:
                 })
                 sentiments.append(0)
                 current_intensifier = None
+                negacao = False
         
         # Determina a qualidade geral com base nos sentimentos encontrados
         if not sentiments:
