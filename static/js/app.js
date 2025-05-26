@@ -5,6 +5,7 @@ async function evaluateComment() {
   const aspectsDiv = document.getElementById("aspects");
   const improvementTip = document.getElementById("improvement-tip");
   const sentimentIcon = document.getElementById("sentiment-icon");
+  const hotelIcon = document.getElementById("quality").querySelector("svg");
 
   // Mostrar resultado e definir estado de carregamento
   resultDiv.classList.remove("hidden");
@@ -35,12 +36,15 @@ async function evaluateComment() {
     if (data.quality === "positivo") {
       sentimentIcon.textContent = "😃";
       sentimentIcon.className = "text-3xl text-green-500";
+      hotelIcon.parentElement.className = "w-8 h-8 mr-3 text-green-600";
     } else if (data.quality === "negativo") {
       sentimentIcon.textContent = "😞";
       sentimentIcon.className = "text-3xl text-red-500";
+      hotelIcon.parentElement.className = "w-8 h-8 mr-3 text-red-600";
     } else {
       sentimentIcon.textContent = "😐";
       sentimentIcon.className = "text-3xl text-yellow-500";
+      hotelIcon.parentElement.className = "w-8 h-8 mr-3 text-yellow-600";
     }
 
     // Mostrar qualidade
