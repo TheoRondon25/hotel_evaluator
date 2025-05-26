@@ -20,30 +20,12 @@ O **HotelEvaluator** utiliza técnicas de NLP para analisar comentários de clie
 
 ## ⚡ Como rodar localmente
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/hotel_evaluator.git
-   cd hotel_evaluator
-   ```
-2. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Baixe o modelo spaCy em português:
-   ```bash
-   python -m spacy download pt_core_news_sm
-   ```
-4. Execute a aplicação:
-   ```bash
-   python main.py
-   ```
-5. Acesse no navegador: [http://localhost:5000](http://localhost:5000)
+1. Clone o repositório
+2. Instale as dependências: `pip install -r requirements.txt`
+3. Baixe o modelo spaCy em português: `python -m spacy download pt_core_news_sm`
+4. Execute a aplicação: `python main.py`
+5. Acesse http://localhost:5000 no navegador
 
-## ☁️ Hospedagem
+## Hospedagem
 
-O projeto está hospedado em:  
-🔗 [https://hotel-evaluator.onrender.com/](https://hotel-evaluator.onrender.com/)
-
-
-
-Desenvolvido por [Kevin](https://www.linkedin.com/in/kevin-lopes-151797221/)
+Este projeto está configurado para ser facilmente hospedado na plataforma Render.
