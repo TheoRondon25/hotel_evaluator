@@ -23,11 +23,6 @@ def evaluate():
         if not comment:
             return jsonify({"error": "O comentário não pode estar vazio"}), 400
             
-        # Verificação gramatical
-        grammar_check = evaluator.parse_comment(comment)
-        if "error" in grammar_check:
-            return jsonify({"error": "Comentário fora da gramática permitida. Por favor, utilize frases que estão dentro da gramática permitida."}), 400
-        
         result = evaluator.evaluate_comment(comment)
         return jsonify(result)
     except Exception as e:
