@@ -2,10 +2,11 @@ from numpy import positive
 import spacy;
 import unicodedata;
 import re;
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
 
 #Carrega o modelo de linguagem em português do spacy
 nlp = spacy.load("pt_core_news_sm");
-
 
 # Define as categorias da gramática e os respectivos conjuntos(tokens) de palavras associadas a cada categoria
 tokens_gramatica = {
@@ -49,11 +50,103 @@ def categorizar_tokens(frase):
     return resultado
 
 
+@dataclass
+class EvaluationResult:
+    aspect: str
+    sentiment: str
+    intensifier: Optional[str] = None
+
+
 class HotelEvaluator:
-    def evaluete_comment(self, comment:str) -> dict:
+    def __init__(self):
+        self.nlp = spacy.load("pt_core_news_sm")
+
+    def evaluate_comment(self, comment: str) -> dict:
+        """
+        Avalia um comentário sobre um hotel e retorna uma análise de sentimento.
+        
+        Args:
+            comment (str): O comentário a ser avaliado
+            
+        Returns:
+            dict: Dicionário contendo a qualidade geral e os aspectos avaliados
+        """
+        if not comment or not isinstance(comment, str):
+            return {"error": "Comentário inválido"}
+
+        # Processa o comentário
+        doc = self.nlp(comment.lower())
+        
+        # Inicializa variáveis para análise
+        current_aspect = None
+        current_intensifier = None
+        results = []
+        sentiments = []
+        
+        # Analisa cada token
+        for token in doc:
+            token_text = token.text.lower()
+            
+            # Verifica se é um aspecto
+            if token_text in tokens_gramatica["Area"]:
+                current_aspect = token_text
+            
+            # Verifica se é um intensificador
+            elif token_text in tokens_gramatica["Intensificador"]:
+                current_intensifier = token_text
+            
+            # Verifica se é um sentimento
+            elif token_text in tokens_gramatica["Positivo"]:
+                sentiment = "positivo"
+                results.append({
+                    "aspect": current_aspect or "geral",
+                    "sentiment": sentiment,
+                    "intensifier": current_intensifier
+                })
+                sentiments.append(1)
+                current_intensifier = None
+                
+            elif token_text in tokens_gramatica["Negativo"]:
+                sentiment = "negativo"
+                results.append({
+                    "aspect": current_aspect or "geral",
+                    "sentiment": sentiment,
+                    "intensifier": current_intensifier
+                })
+                sentiments.append(-1)
+                current_intensifier = None
+                
+            elif token_text in tokens_gramatica["Neutro"]:
+                sentiment = "neutro"
+                results.append({
+                    "aspect": current_aspect or "geral",
+                    "sentiment": sentiment,
+                    "intensifier": current_intensifier
+                })
+                sentiments.append(0)
+                current_intensifier = None
+        
+        # Determina a qualidade geral com base nos sentimentos encontrados
+        if not sentiments:
+            overall_quality = "neutro"
+        else:
+            avg_sentiment = sum(sentiments) / len(sentiments)
+            if avg_sentiment > 0.3:
+                overall_quality = "positivo"
+            elif avg_sentiment < -0.3:
+                overall_quality = "negativo"
+            else:
+                overall_quality = "neutro"
+        
+        return {
+            "quality": overall_quality,
+            "results": results
+        }
+
+    def parse_comment(self, comment: str) -> dict:
         tokens = categorizar_tokens(comment)
-        if any (cat == "Desconhecido" for _, cat in tokens):
-            return {"error":"Comentário inválido conforme a gramática fornecida"}
+        if any(cat == "Desconhecido" for _, cat in tokens):
+            return {"error": "Comentário inválido conforme a gramática fornecida"}
         
         results = []
         current_aspect = []
@@ -120,9 +213,9 @@ class HotelEvaluator:
                 quality = "excelente"
             else:
                 quality = "bom"
-                
-                return {
-                    "results": results,
-                    "quality": quality
-                }
+            
+            return {
+                "results": results,
+                "quality": quality
+            }
                     

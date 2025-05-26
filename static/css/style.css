@@ -1,0 +1,167 @@
+/* Estilos personalizados para o HotelEvaluator */
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Estilos gerais */
+body {
+  scroll-behavior: smooth;
+}
+
+/* Estilização da barra de rolagem */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Estilo do textarea */
+textarea {
+  transition: all 0.3s ease;
+  min-height: 120px;
+}
+
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  outline: none;
+}
+
+/* Estilo dos botões de exemplo */
+.example-btn {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.example-btn:hover {
+  transform: translateY(-2px);
+  border-color: #6366f1;
+}
+
+/* Estilo dos aspectos */
+.aspect-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #f8fafc;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+  border-left: 3px solid #6366f1;
+}
+
+.aspect-item.positive {
+  border-left-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.aspect-item.negative {
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.aspect-item.neutral {
+  border-left-color: #94a3b8;
+  background-color: #f8fafc;
+}
+
+/* Estilo do botão de análise */
+#analyzeBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilo do contador de caracteres */
+#charCount {
+  font-family: monospace;
+}
+
+/* Animações de entrada */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Estilo para o ícone de sentimento */
+.sentiment-icon {
+  transition: all 0.3s ease;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  #aspects {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Efeito de loading */
+.loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Melhorias de acessibilidade */
+:focus-visible {
+  outline: 3px solid #4f46e5;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Transição suave para elementos interativos */
+a, button, .btn {
+  transition: all 0.2s ease;
+}
+
+/* Efeito de hover nos cards */
+.hover-scale {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
