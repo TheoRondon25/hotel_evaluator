@@ -30,4 +30,4 @@ O **HotelEvaluator** utiliza técnicas de NLP para analisar comentários de clie
 
 Este projeto está hospedado na plataforma Render <a>https://hotel-evaluator.onrender.com/</a>
 
-Desenvolvido por [Kevin](https://www.linkedin.com/in/kevin-lopes-151797221/)
+Desenvolvido por [Kevin](https://www.linkedin.com/in/kevin-lopes-151797221/) e [Theo](https://www.linkedin.com/in/th%C3%A9o-rondon-b7259726b/)
