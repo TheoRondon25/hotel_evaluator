@@ -31,22 +31,20 @@ def expandir_genero(palavras: List[str]) -> Set[str]:
             resultado.add(palavra[:-1] + 'a')
             resultado.add(palavra + 's')  # plural masculino
             resultado.add(palavra[:-1] + 'as')  # plural feminino
-        elif palavra.endswith('a'):  # feminino -> masculino (ex: bonita -> bonito)
-            resultado.add(palavra[:-1] + 'o')
-            resultado.add(palavra + 's')  # plural feminino
-            resultado.add(palavra[:-1] + 'os')  # plural masculino
-        elif palavra.endswith('os'):
-            resultado.add(palavra[:-2] + 'o')
-            resultado.add(palavra[:-2] + 'a')
-            resultado.add(palavra[:-2] + 'as')
-        elif palavra.endswith('as'):
-            resultado.add(palavra[:-2] + 'a')
-            resultado.add(palavra[:-2] + 'o')
-            resultado.add(palavra[:-2] + 'os')
+        elif palavra.endswith('a'): # para as areas 
+            resultado.add(palavra + 's')
         elif palavra.endswith('or'):  # (ex: encantador -> encantadora)
             resultado.add(palavra + 'a')
             resultado.add(palavra + 'es')
             resultado.add(palavra + 'as')
+        elif palavra.endswith('os'):
+            resultado.add(palavra[:-1])
+            resultado.add(palavra[:-2] + 'a')
+            resultado.add(palavra[:-2] + 'as')
+        elif palavra.endswith('m'): 
+            resultado.add(palavra[:-1] + 'ns') # bom -> bons, ruim -> ruins, etc.
+        elif palavra.endswith('l'):
+            resultado.add(palavra[:-1] + 'is')
         else:
             # Adiciona plural simples
             resultado.add(palavra + 's')
@@ -55,12 +53,12 @@ def expandir_genero(palavras: List[str]) -> Set[str]:
 
 # Definições base de palavras
 positivas_base = ["otimo", "excelente", "perfeito", "maravilhoso", "agradavel", 
-                 "bom", "incrivel", "fantastico", "delicioso", "espetacular", 
-                 "surpreendente", "esplendido", "encantador", "satisfatorio"]
+                 "bom", "boa", "incrivel", "fantastico", "delicioso", "espetacular", "confortavel",
+                 "surpreendente", "esplendido", "encantador", "satisfatorio", "bonito", "lindo", "aconchegante"]
                  
 negativas_base = ["pessimo", "ruim", "terrivel", "desagradavel", "horrivel", 
                  "fraco", "insatisfatorio", "inadequado", "decepcionante", 
-                 "desapontador", "deploravel", "lamentavel"]
+                 "desapontador", "deploravel", "lamentavel", "feio", "desconfortavel"]
                  
 neutras_base = ["normal", "razoavel", "ok", "regular", "medio", "comum", "aceitavel"]
 
@@ -71,12 +69,12 @@ areas_base = ["quarto", "estadia", "comida", "restaurante", "atendimento", "pisc
 # Define as categorias da gramática e os respectivos conjuntos(tokens) de palavras associadas a cada categoria
 tokens_gramatica = {
     "Det": {"o", "a", "essa", "esse", "minha", "meu"},
-    "Verb": {"foi", "esta", "é", "parece", "sao", "estao", "estava", "estar", "ser"},
+    "Verb": {"foi", "foram", "esta", "é", "era", "eram", "parece", "parecia", "pareciam", "sao", "estao", "estava", "estar", "estavam"},
     "Intensificador": {"muito", "super", "pouco", "bastante", "extremamente"},
     "Positivo": expandir_genero(positivas_base),
     "Negativo": expandir_genero(negativas_base),
     "Neutro": expandir_genero(neutras_base),
-    "Area": set(areas_base),
+    "Area": expandir_genero(areas_base),
     "Conector": {"mas", "porem", "e", "contudo", "entretanto", ","}
 }
 
