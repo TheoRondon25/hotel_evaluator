@@ -286,3 +286,4 @@ class HotelEvaluator:
             "quality": overall_quality,
             "results": results
         }
+    
